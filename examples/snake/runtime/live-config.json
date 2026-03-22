@@ -1,0 +1,20 @@
+{
+  "theme": {
+    "bg": "#f5f1e8",
+    "panel": "#fffaf0",
+    "border": "#d4cbbe",
+    "grid": "#ebe5d8",
+    "cell": "#f8f4ec",
+    "snake": "#3a8a5c",
+    "snakeHead": "#276942",
+    "food": "#c4513d",
+    "text": "#2f2a24",
+    "muted": "#8a7f70"
+  },
+  "gameplay": {
+    "tickMs": 140
+  },
+  "copy": {
+    "helpText": "Arrow keys or WASD to move. Press Space or P to pause."
+  }
+}

@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Snake</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <main class="app">
+      <section class="panel game-panel">
+        <div class="status">
+          <div>
+            <p class="label">Score</p>
+            <p id="score" class="value">0</p>
+          </div>
+          <div>
+            <p class="label">State</p>
+            <p id="game-state" class="value">Running</p>
+          </div>
+        </div>
+
+        <div id="board" class="board" aria-label="Snake game board" role="grid"></div>
+
+        <div class="actions">
+          <button id="pause-button" type="button">Pause <kbd>Space/P</kbd></button>
+          <button id="restart-button" type="button">Restart <kbd>R</kbd></button>
+        </div>
+
+        <div class="controls" aria-label="Touch controls">
+          <button class="control up" data-direction="up" type="button">Up <kbd>W / ↑</kbd></button>
+          <button class="control left" data-direction="left" type="button">Left <kbd>A / ←</kbd></button>
+          <button class="control down" data-direction="down" type="button">Down <kbd>S / ↓</kbd></button>
+          <button class="control right" data-direction="right" type="button">Right <kbd>D / →</kbd></button>
+        </div>
+
+        <p id="help-text" class="help">
+          Arrow keys or WASD to move. Press Space or P to pause.
+        </p>
+      </section>
+
+    </main>
+
+    <aside
+      id="spark-dock"
+      class="spark-dock is-collapsed"
+      aria-label="Spark editor"
+    >
+      <button
+        id="dock-toggle"
+        class="dock-toggle"
+        type="button"
+        aria-label="Open Spark"
+        aria-expanded="false"
+        aria-controls="dock-panel"
+      >
+        <span class="sr-only">Spark</span>
+        <svg class="dock-toggle-icon" viewBox="0 0 24 24" aria-hidden="true">
+          <path
+            d="M12 2.5 14.7 9.3 21.5 12l-6.8 2.7L12 21.5l-2.7-6.8L2.5 12l6.8-2.7L12 2.5Z"
+          />
+          <path
+            d="M18.5 3.5 19.4 5.6 21.5 6.5 19.4 7.4 18.5 9.5 17.6 7.4 15.5 6.5 17.6 5.6 18.5 3.5Z"
+          />
+        </svg>
+      </button>
+
+      <section id="dock-panel" class="panel chat-panel" tabindex="-1">
+        <div class="chat-header">
+          <div>
+            <p class="label">Spark</p>
+            <p id="chat-status" class="chat-status">Ready</p>
+          </div>
+          <p class="chat-note">A separate creation workspace for edits, summaries, branches, and rollback.</p>
+        </div>
+
+        <div id="messages" class="messages" aria-live="polite"></div>
+
+        <form id="chat-form" class="chat-form">
+          <label class="sr-only" for="chat-input">Message</label>
+          <textarea
+            id="chat-input"
+            name="message"
+            rows="4"
+            placeholder="例如：我希望背景要暗一点，蛇颜色更亮一点。"
+            required
+          ></textarea>
+          <button id="send-button" type="submit">Send</button>
+        </form>
+
+        <section class="history-panel" aria-label="Change history">
+          <div class="history-header">
+            <p class="label">History</p>
+            <p id="history-status" class="history-status">Loading</p>
+          </div>
+          <div id="history-list" class="history-list"></div>
+        </section>
+      </section>
+    </aside>
+
+    <script type="module" src="./src/main.js"></script>
+  </body>
+</html>

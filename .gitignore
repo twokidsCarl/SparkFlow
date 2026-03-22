@@ -1,0 +1,8 @@
+__pycache__/
+*.pyc
+.DS_Store
+
+examples/snake/runtime/snapshots/
+examples/snake/runtime/history.json
+
+spark/.env
