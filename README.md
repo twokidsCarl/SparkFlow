@@ -1,23 +1,23 @@
-# Spark
+# SparkFlow
 
-`Spark` is a standalone AI editing service for local apps and prototypes.
+SparkFlow is a local AI editing workspace for small apps and prototypes.
 
-This repo currently includes one example app:
-- `examples/snake/`
-  A minimal Snake game wired to Spark for live edits, history, and rollback.
+It runs as two separate local services:
 
-## Architecture
+- the app you are editing
+- the SparkFlow service that handles chat-driven edits, runtime config updates, history snapshots, branching, and rollback
 
-- `spark/server.py`
-  Runs the Spark service for chat, code edits, history, and rollback.
-- `examples/snake/app_server.py`
-  Serves the Snake example as a static app.
-- `examples/snake/src/`
-  Frontend game logic and UI behavior for the example.
-- `examples/snake/runtime/`
-  Runtime config, history index, and snapshots for the example.
+This repository currently ships with one example app, a browser-based Snake game in [`examples/snake/`](examples/snake).
 
-## Project Layout
+## What It Does
+
+- Applies AI-generated source edits to an existing local app
+- Streams progress and assistant output back to the browser
+- Persists change history with snapshots
+- Supports rollback to earlier states
+- Keeps app runtime config separate from source files
+
+## Repository Layout
 
 ```text
 .
@@ -37,27 +37,42 @@ This repo currently includes one example app:
 │       └── styles.css
 ├── server.py
 ├── spark/
-│   ├── .env
+│   ├── .env.example
 │   └── server.py
 └── tests/
 ```
 
+## Core Pieces
+
+- [`spark/server.py`](spark/server.py)
+  The SparkFlow backend. Exposes chat, config, history, rollback, and event-stream endpoints.
+- [`examples/snake/app_server.py`](examples/snake/app_server.py)
+  Static file server for the example app.
+- [`examples/snake/src/main.js`](examples/snake/src/main.js)
+  Game loop, Spark dock UI, history rendering, and rollback wiring.
+- [`examples/snake/src/liveConfig.js`](examples/snake/src/liveConfig.js)
+  Runtime config loading and CSS variable application.
+- [`tests/`](tests)
+  Unit tests and browser-level smoke tests.
+
 ## Requirements
 
 - Python 3.14+
-- Network access from the Spark service
-- A valid API key configured in `spark/.env`
+- Network access from the SparkFlow service to the configured AI endpoint
+- A valid API key in `spark/.env`
+
+Create `spark/.env` from [`spark/.env.example`](spark/.env.example) and fill in your credentials.
 
 ## Quick Start
 
-Start the app server:
+Start the example app:
 
 ```bash
 cd /Users/carl/Desktop/project/SparkFlow
 python3 examples/snake/app_server.py
 ```
 
-Start Spark in a second terminal:
+Start SparkFlow in another terminal:
 
 ```bash
 cd /Users/carl/Desktop/project/SparkFlow
@@ -66,62 +81,67 @@ python3 spark/server.py
 
 Open:
 
-- Snake example: [http://127.0.0.1:4173/](http://127.0.0.1:4173/)
-- Spark API: `http://127.0.0.1:5050`
+- App: [http://127.0.0.1:4173/](http://127.0.0.1:4173/)
+- API: [http://127.0.0.1:5050/api/config](http://127.0.0.1:5050/api/config)
+
+## API Surface
+
+SparkFlow currently exposes:
+
+- `GET /api/config`
+- `GET /api/history`
+- `GET /events`
+- `POST /api/chat`
+- `POST /api/rollback`
+
+`/api/chat` streams newline-delimited JSON events so the frontend can render incremental assistant output and progress states.
+
+## Configuration
+
+Frontend app connection:
+
+- [`examples/snake/app-config.json`](examples/snake/app-config.json)
+  - `sparkBaseUrl`
+
+SparkFlow environment variables:
+
+- `AI_API_ENDPOINT`
+- `AI_API_KEY`
+- `AI_MODEL`
+- `SPARK_PORT`
+- `APP_ORIGIN`
 
 ## Tests
 
-Run the repo test suite:
+Run the full test suite:
 
 ```bash
 cd /Users/carl/Desktop/project/SparkFlow
 python3 -m unittest discover -s tests -v
 ```
 
-The suite covers:
+Current coverage includes:
 
-- Spark backend unit tests for progress events, history snapshots, and branch metadata
-- browser-facing smoke tests for the app HTML, Spark API, event stream, and chat streaming contract
-
-## Configuration
-
-Snake example frontend connection target:
-
-- `examples/snake/app-config.json`
-  - `sparkBaseUrl`
-
-Spark environment:
-
-- `spark/.env`
-  - `AI_API_ENDPOINT`
-  - `AI_API_KEY`
-  - `AI_MODEL`
-  - `SPARK_PORT`
-  - `APP_ORIGIN`
+- history snapshot and restore behavior
+- branch metadata persistence
+- source edit validation and application
+- config merge and gameplay guardrails
+- chat response parsing
+- app and SparkFlow HTTP smoke contracts
 
 ## Development Notes
 
-- Spark and the example app are intentionally separated.
-- The example app does not edit files directly.
-- Spark owns source edits, history, snapshots, and rollback.
-- Example rollback snapshots are stored in `examples/snake/runtime/snapshots/`.
+- SparkFlow edits only files inside the example workspace that match supported suffixes.
+- `runtime/` is treated as managed state, not editable source.
+- Gameplay config changes are blocked unless the user explicitly asks for gameplay or speed changes.
+- Rollback snapshots are stored in `examples/snake/runtime/snapshots/`.
 
-## Manual Verification
+## Manual Check
 
-- Open the Snake example and confirm the game still plays normally.
-- Open the floating Spark panel and send a UI change request.
-- Confirm the page reloads and chat history remains visible.
-- Check that the History timeline shows the new change.
-- Click `Rollback` on a timeline item and confirm the previous version returns.
-
-## Release Checklist
-
-- Update `README.md` if the API contract changes.
-- Verify `spark/.env.example` matches required runtime configuration.
-- Test `examples/snake/app_server.py` and `spark/server.py` independently.
-- Confirm cross-origin requests still work between the example app and Spark.
-- Confirm at least one edit and one rollback work end-to-end.
-- Review any generated snapshots in `examples/snake/runtime/snapshots/`.
+- Open the Snake app and confirm the game runs.
+- Open the Spark dock and request a visual change.
+- Confirm the UI updates and history remains visible after reload.
+- Roll back from the history panel and confirm the earlier state returns.
 
 ## License
 
